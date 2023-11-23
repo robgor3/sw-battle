@@ -1,4 +1,7 @@
 import { Route } from '@angular/router';
-import { NxWelcomeComponent } from './nx-welcome.component';
+import { BattlegroundComponent } from '@sw-battle/battle';
 
-export const appRoutes: Route[] = [{ path: '', component: NxWelcomeComponent }];
+export const appRoutes: Route[] = [
+  { path: '', component: BattlegroundComponent },
+  { path: '**', redirectTo: '' },
+];
