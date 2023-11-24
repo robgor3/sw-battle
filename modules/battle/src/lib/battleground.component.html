@@ -8,7 +8,8 @@
     </div>
 
     <div class="game__actions">
-      <sw-battle-start-battle-button />
+      <sw-battle-ui-button (click)="onResetButtonClick()" [text]="'Reset game'" swBattleWarnPrimary />
+      <sw-battle-ui-button (click)="onFightButtonClick()" [text]="'Fight!'" swBattleButtonPrimary />
     </div>
   </div>
 </section>

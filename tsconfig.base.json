@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@sw-battle/battle": ["modules/battle/src/index.ts"]
+      "@sw-battle/battle": ["modules/battle/src/index.ts"],
+      "@sw-battle/ui": ["modules/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

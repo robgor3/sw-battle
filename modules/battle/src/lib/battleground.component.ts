@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective } from '@sw-battle/ui';
 import { BattleService } from './battle.service';
 import { PlayerComponent } from './player/player.component';
-import { StartBattleButtonComponent } from './start-battle-button/start-battle-button.component';
 
 @Component({
-  imports: [CommonModule, PlayerComponent, StartBattleButtonComponent],
+  imports: [CommonModule, PlayerComponent, ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective],
   providers: [BattleService],
   standalone: true,
   selector: 'sw-battle-battleground',
@@ -15,4 +15,12 @@ import { StartBattleButtonComponent } from './start-battle-button/start-battle-b
 })
 export class BattlegroundComponent {
   constructor(private readonly battleService: BattleService) {}
+
+  public onFightButtonClick(): void {
+    this.battleService.fight();
+  }
+
+  public onResetButtonClick(): void {
+    this.battleService.resetGame();
+  }
 }
