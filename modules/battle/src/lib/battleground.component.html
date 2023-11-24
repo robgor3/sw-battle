@@ -3,8 +3,8 @@
 
   <div class="game">
     <div class="game__players">
-      <sw-battle-player [name]="'Luke Skywalker'"></sw-battle-player>
-      <sw-battle-player [name]="'Obi-Wan Kenobi'"></sw-battle-player>
+      <sw-battle-player [contender]="firstContender$ | async"></sw-battle-player>
+      <sw-battle-player [contender]="secondContender$ | async"></sw-battle-player>
     </div>
 
     <div class="game__actions">
