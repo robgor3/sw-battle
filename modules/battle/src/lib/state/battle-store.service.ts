@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, map, Observable, take, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, Observable, tap } from 'rxjs';
 import { BattleStateModel } from '../models/battle-state-model';
+import { Contender } from '../models/contender';
+import { GameMetadata } from '../models/game-metadata';
 import { GameMode } from '../models/game-mode';
-import { BattleApiService, GameMetadata } from './api/battle-api.service';
 import { getDefaultBattleState } from './get-default-battle-state';
 
 @Injectable()
-export class BattleState {
+export class BattleStore {
   private readonly state$: BehaviorSubject<BattleStateModel> = new BehaviorSubject<BattleStateModel>(
     getDefaultBattleState(),
   );
 
-  constructor(private readonly apiService: BattleApiService) {
+  constructor() {
     // TODO dev only, remove
     this.state$
       .pipe(
@@ -26,21 +27,8 @@ export class BattleState {
     this.patchState({ gameMode });
   }
 
-  public getGameMetadata(): void {
-    this.apiService
-      .getGameMetadata$()
-      .pipe(
-        tap({
-          next: (gameMetadata: GameMetadata) => {
-            this.patchState({ gameMetadata });
-          },
-          error: () => {
-            this.patchState({ gameMetadata: { totalPeopleCount: 0, totalStarshipsCount: 0 } });
-          },
-        }),
-        take(1),
-      )
-      .subscribe();
+  public setContenders([firstContender, secondContender]: [Contender, Contender]): void {
+    this.patchState({ firstContender, secondContender });
   }
 
   public select<T>(selector: (state: BattleStateModel) => T): Observable<T> {

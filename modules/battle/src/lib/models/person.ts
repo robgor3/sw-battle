@@ -1,1 +1,4 @@
-export interface Person {}
+export interface Person {
+  name: string;
+  mass: number;
+}

@@ -1,29 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ApiPaginationResponse, ApiResponse } from '@sw-battle/shared/models';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { GameMetadata } from '../../models/game-metadata';
 import { Person } from '../../models/person';
 import { PersonApi } from '../../models/person-api';
 import { Starship } from '../../models/starship';
 import { StarshipApi } from '../../models/starship-api';
 import { BattleAdapterService } from './battle-adapter.service';
-
-export interface GameMetadata {
-  totalPeopleCount: number;
-  totalStarshipsCount: number;
-}
-
-export interface PeopleMetadata {
-  total_records: number;
-}
-
-export interface ApiPaginationResponse<T = unknown> {
-  message: string;
-  total_records: number;
-  total_pages: number;
-  previous: string;
-  next: string;
-  results: T[];
-}
 
 @Injectable()
 export class BattleApiService {
@@ -47,15 +31,15 @@ export class BattleApiService {
   }
 
   public getPerson$(id: number): Observable<Person | null> {
-    return this.http.get<PersonApi>(`people/${id}`).pipe(
-      map((response: PersonApi) => this.battleAdapterService.adaptPerson(response)),
+    return this.http.get<ApiResponse<PersonApi>>(`people/${id}`).pipe(
+      map((response: ApiResponse<PersonApi>) => this.battleAdapterService.adaptPerson(response)),
       catchError(() => of(null)),
     );
   }
 
   public getStarship$(id: number): Observable<Starship | null> {
-    return this.http.get<StarshipApi>(`people/${id}`).pipe(
-      map((response: StarshipApi) => this.battleAdapterService.adaptStarship(response)),
+    return this.http.get<ApiResponse<StarshipApi>>(`starships/${id}`).pipe(
+      map((response: ApiResponse<StarshipApi>) => this.battleAdapterService.adaptStarship(response)),
       catchError(() => of(null)),
     );
   }

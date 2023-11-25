@@ -20,7 +20,8 @@
             "prefix": "sw-battle",
             "style": "kebab-case"
           }
-        ]
+        ],
+        "no-extra-boolean-cast": "off"
       }
     },
     {

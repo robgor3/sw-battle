@@ -1,5 +1,5 @@
-import { GameMetadata } from '../state/api/battle-api.service';
 import { Contender } from './contender';
+import { GameMetadata } from './game-metadata';
 import { GameMode } from './game-mode';
 
 export interface BattleStateModel {

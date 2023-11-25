@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { BattleEngineService } from './engine/battle-engine.service';
 import { BattleStateModel } from './models/battle-state-model';
 import { Contender } from './models/contender';
+import { GameMetadata } from './models/game-metadata';
 import { GameMode } from './models/game-mode';
-import { GameMetadata } from './state/api/battle-api.service';
-import { BattleState } from './state/battle.state';
+import { BattleStore } from './state/battle-store.service';
 
 @Injectable()
 export class BattleService {
@@ -19,14 +20,16 @@ export class BattleService {
     ({ gameMetadata }: BattleStateModel) => gameMetadata,
   );
 
-  constructor(private readonly store: BattleState) {}
+  constructor(private readonly store: BattleStore, private readonly battleEngineService: BattleEngineService) {}
 
-  public init(): void {
-    this.store.getGameMetadata();
+  public getGameMetadata$(): Observable<GameMetadata> {
+    return this.battleEngineService.getGameMetadata$();
   }
 
-  public fight(): void {
-    console.log('fight');
+  public fight(): Observable<Contender[]> {
+    return this.battleEngineService
+      .getPlayers$({ metadata$: this.gameMetadata$, mode$: this.gameMode$ })
+      .pipe(tap((contenders: [Contender, Contender]) => this.store.setContenders(contenders)));
   }
 
   public setGameMode(gameMode: GameMode): void {

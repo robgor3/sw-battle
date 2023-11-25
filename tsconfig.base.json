@@ -17,6 +17,7 @@
     "paths": {
       "@sw-battle/app-config": ["modules/app-config/src/index.ts"],
       "@sw-battle/battle": ["modules/battle/src/index.ts"],
+      "@sw-battle/shared/models": ["modules/shared/models/src/index.ts"],
       "@sw-battle/ui": ["modules/ui/src/index.ts"]
     }
   },

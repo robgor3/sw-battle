@@ -1,5 +1,5 @@
 {
-  "extends": ["../../.eslintrc.base.json"],
+  "extends": ["../../../.eslintrc.base.json"],
   "ignorePatterns": ["!**/*"],
   "overrides": [
     {
@@ -21,8 +21,7 @@
             "prefix": "sw-battle",
             "style": "kebab-case"
           }
-        ],
-        "no-extra-boolean-cast": "off"
+        ]
       }
     },
     {
