@@ -5,10 +5,9 @@ const DEFAULT_BATTLE_STATE_MODEL: BattleStateModel = {
   gameMode: GameMode.PEOPLE,
   firstContender: null,
   secondContender: null,
-  result: {
-    firstContenderWins: 0,
-    secondContenderWins: 0,
-  },
+  currentWinnerId: null,
+  firstContenderWinsCount: 0,
+  secondContenderWinsCount: 0,
   gameMetadata: {
     maxPeopleId: 0,
     maxStarshipsId: 0,

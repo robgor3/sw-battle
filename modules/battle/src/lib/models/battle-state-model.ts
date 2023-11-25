@@ -6,9 +6,8 @@ export interface BattleStateModel {
   gameMode: GameMode;
   firstContender: Contender;
   secondContender: Contender;
-  result: {
-    firstContenderWins: number;
-    secondContenderWins: number;
-  };
+  currentWinnerId: number | null;
+  firstContenderWinsCount: number;
+  secondContenderWinsCount: number;
   gameMetadata: GameMetadata;
 }

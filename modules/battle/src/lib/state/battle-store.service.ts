@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, map, Observable, tap } from 'rxjs';
 import { BattleStateModel } from '../models/battle-state-model';
-import { Contender } from '../models/contender';
 import { GameMetadata } from '../models/game-metadata';
 import { GameMode } from '../models/game-mode';
+import { GameResult } from '../models/game-result';
 import { getDefaultBattleState } from './get-default-battle-state';
 
 @Injectable()
@@ -18,6 +18,11 @@ export class BattleStore {
       .pipe(
         tap((state: BattleStateModel) => {
           console.log(state);
+          console.log({
+            firstContender: state.firstContenderWinsCount,
+            secondContender: state.secondContenderWinsCount,
+            currentWinnerId: state.currentWinnerId,
+          });
         }),
       )
       .subscribe();
@@ -27,8 +32,20 @@ export class BattleStore {
     this.patchState({ gameMode });
   }
 
-  public setContenders([firstContender, secondContender]: [Contender, Contender]): void {
-    this.patchState({ firstContender, secondContender });
+  public setGameResult({ winnerId, firstContender, secondContender }: GameResult): void {
+    const { firstContenderWinsCount, secondContenderWinsCount }: BattleStateModel = this.getCurrentStateValue();
+    const firstContenderWins: number =
+      winnerId === firstContender.id ? firstContenderWinsCount + 1 : firstContenderWinsCount;
+    const secondContenderWins: number =
+      winnerId === secondContender.id ? secondContenderWinsCount + 1 : secondContenderWinsCount;
+
+    this.patchState({
+      firstContender,
+      secondContender,
+      currentWinnerId: winnerId,
+      firstContenderWinsCount: firstContenderWins,
+      secondContenderWinsCount: secondContenderWins,
+    });
   }
 
   public select<T>(selector: (state: BattleStateModel) => T): Observable<T> {
@@ -40,15 +57,11 @@ export class BattleStore {
   }
 
   public patchState(state: Partial<BattleStateModel>): void {
-    const currentValue: BattleStateModel = this.state$.getValue();
+    const currentValue: BattleStateModel = this.getCurrentStateValue();
 
     this.state$.next({
       ...currentValue,
       ...state,
-      result: {
-        ...currentValue.result,
-        ...state.result,
-      },
     });
   }
 
@@ -57,11 +70,15 @@ export class BattleStore {
   }
 
   public resetStateWithoutMetadata(): void {
-    const gameMetadata: GameMetadata = this.state$.getValue().gameMetadata;
+    const gameMetadata: GameMetadata = this.getCurrentStateValue().gameMetadata;
 
     this.state$.next({
       ...getDefaultBattleState(),
       gameMetadata,
     });
+  }
+
+  private getCurrentStateValue(): BattleStateModel {
+    return this.state$.getValue();
   }
 }

@@ -5,6 +5,7 @@ import { BattleStateModel } from './models/battle-state-model';
 import { Contender } from './models/contender';
 import { GameMetadata } from './models/game-metadata';
 import { GameMode } from './models/game-mode';
+import { GameResult } from './models/game-result';
 import { BattleStore } from './state/battle-store.service';
 
 @Injectable()
@@ -26,10 +27,12 @@ export class BattleService {
     return this.battleEngineService.getGameMetadata$();
   }
 
-  public fight(): Observable<Contender[]> {
-    return this.battleEngineService
-      .getPlayers$({ metadata$: this.gameMetadata$, mode$: this.gameMode$ })
-      .pipe(tap((contenders: [Contender, Contender]) => this.store.setContenders(contenders)));
+  public fight(): Observable<GameResult> {
+    return this.battleEngineService.playGame$({ metadata$: this.gameMetadata$, mode$: this.gameMode$ }).pipe(
+      tap((result: GameResult) => {
+        this.store.setGameResult(result);
+      }),
+    );
   }
 
   public setGameMode(gameMode: GameMode): void {

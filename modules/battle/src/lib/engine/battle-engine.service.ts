@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import { combineLatest, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
-import { Contender } from '../models/contender';
+import { Contender, ExistingContender } from '../models/contender';
 import { GameMetadata } from '../models/game-metadata';
 import { GameMode } from '../models/game-mode';
+import { GameParams } from '../models/game-params';
+import { GameResult } from '../models/game-result';
 import { Person } from '../models/person';
 import { Starship } from '../models/starship';
 import { BattleApiService } from '../state/api/battle-api.service';
 import { BattleStore } from '../state/battle-store.service';
-
-export interface GameParams {
-  metadata$: Observable<GameMetadata>;
-  mode$: Observable<GameMode>;
-}
 
 @Injectable()
 export class BattleEngineService {
@@ -30,7 +27,7 @@ export class BattleEngineService {
     );
   }
 
-  public getPlayers$({ metadata$, mode$ }: GameParams): Observable<[Contender, Contender]> {
+  public playGame$({ metadata$, mode$ }: GameParams): Observable<GameResult> {
     return combineLatest([mode$, metadata$]).pipe(
       switchMap(([mode, metadata]: [GameMode, GameMetadata]) => {
         console.log(mode);
@@ -39,10 +36,15 @@ export class BattleEngineService {
           ? this.getPeopleContenders$(metadata.maxPeopleId)
           : this.getStarshipContenders$(metadata.maxStarshipsId);
       }),
+      map(([firstContender, secondContender]: [ExistingContender, ExistingContender]) => ({
+        winnerId: this.chooseWinner(firstContender, secondContender),
+        firstContender,
+        secondContender,
+      })),
     );
   }
 
-  private getPeopleContenders$(rangeLimit: number): Observable<[Contender, Contender]> {
+  private getPeopleContenders$(rangeLimit: number): Observable<[ExistingContender, ExistingContender]> {
     const [firstContenderId, secondContenderId]: [number, number] = this.getContendersIds(rangeLimit);
 
     const firstContender$: Observable<Person> = this.getPersonContender$(
@@ -61,16 +63,19 @@ export class BattleEngineService {
       switchMap(([firstContender, secondContender]: [Person | null, Person | null]) => {
         if (firstContender?.name === secondContender?.name) {
           return this.getPersonContender$(secondContenderId, firstContenderId, rangeLimit).pipe(
-            map((anotherContender: Person | null) => [firstContender, anotherContender] as [Contender, Contender]),
+            map(
+              (anotherContender: Person | null) =>
+                [firstContender, anotherContender] as [ExistingContender, ExistingContender],
+            ),
           );
         }
 
-        return of([firstContender, secondContender] as [Contender, Contender]);
+        return of([firstContender, secondContender] as [ExistingContender, ExistingContender]);
       }),
     );
   }
 
-  private getStarshipContenders$(rangeLimit: number): Observable<[Contender, Contender]> {
+  private getStarshipContenders$(rangeLimit: number): Observable<[ExistingContender, ExistingContender]> {
     const [firstContenderId, secondContenderId]: [number, number] = this.getContendersIds(rangeLimit);
 
     const firstContender$: Observable<Starship> = this.getStarshipContender$(
@@ -89,11 +94,14 @@ export class BattleEngineService {
       switchMap(([firstContender, secondContender]: [Starship | null, Starship | null]) => {
         if (firstContender?.name === secondContender?.name) {
           return this.getStarshipContender$(secondContenderId, firstContenderId, rangeLimit).pipe(
-            map((anotherContender: Starship | null) => [firstContender, anotherContender] as [Contender, Contender]),
+            map(
+              (anotherContender: Starship | null) =>
+                [firstContender, anotherContender] as [ExistingContender, ExistingContender],
+            ),
           );
         }
 
-        return of([firstContender, secondContender] as [Contender, Contender]);
+        return of([firstContender, secondContender] as [ExistingContender, ExistingContender]);
       }),
     );
   }
@@ -107,21 +115,21 @@ export class BattleEngineService {
 
         const newId: number = this.generateNewIdForDuplicate(opponentId, rangeLimit);
 
-        return this.apiService.getPerson$(newId);
+        return this.getPersonContender$(newId, opponentId, rangeLimit);
       }),
     );
   }
 
   private getStarshipContender$(id: number, opponentId: number, rangeLimit: number): Observable<Starship | null> {
     return this.apiService.getStarship$(id).pipe(
-      switchMap((person: Starship | null) => {
-        if (!!person) {
-          return of(person) as Observable<Starship>;
+      switchMap((starship: Starship | null) => {
+        if (!!starship) {
+          return of(starship) as Observable<Starship>;
         }
 
         const newId: number = this.generateNewIdForDuplicate(opponentId, rangeLimit);
 
-        return this.apiService.getStarship$(newId);
+        return this.getStarshipContender$(newId, opponentId, rangeLimit);
       }),
     );
   }
@@ -149,5 +157,22 @@ export class BattleEngineService {
     }
 
     return newId;
+  }
+
+  private chooseWinner(firstContender: Contender, secondContender: Contender): number {
+    if (!firstContender || !secondContender) {
+      throw new Error('Unknown error during contenders draw');
+    }
+
+    if ('mass' in firstContender && 'mass' in secondContender) {
+      const winner: Contender = firstContender.mass > secondContender.mass ? firstContender : secondContender;
+      return winner.id;
+    }
+    if ('crew' in firstContender && 'crew' in secondContender) {
+      const winner: Contender = firstContender.crew > secondContender.crew ? firstContender : secondContender;
+      return winner.id;
+    }
+
+    throw new Error('Unknown contender type');
   }
 }

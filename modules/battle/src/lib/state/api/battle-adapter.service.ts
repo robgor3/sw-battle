@@ -14,7 +14,7 @@ export class BattleAdapterService {
 
     const personProps: PersonApi = response.result.properties;
 
-    return { name: personProps.name, mass: +personProps.mass };
+    return { id: +response.result.uid, name: personProps.name, mass: +personProps.mass };
   }
 
   public adaptStarship(response: ApiResponse<StarshipApi>): Starship | null {
@@ -22,8 +22,8 @@ export class BattleAdapterService {
       return null;
     }
 
-    const personProps: StarshipApi = response.result.properties;
+    const starshipProps: StarshipApi = response.result.properties;
 
-    return { name: personProps.name, crew: +personProps.crew };
+    return { id: +response.result.uid, name: starshipProps.name, crew: +starshipProps.crew };
   }
 }
