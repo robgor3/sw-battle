@@ -24,7 +24,7 @@ export class BattleEngineService {
           this.store.patchState({ gameMetadata });
         },
         error: () => {
-          this.store.patchState({ gameMetadata: { totalPeopleCount: 0, totalStarshipsCount: 0 } });
+          this.store.patchState({ gameMetadata: { maxPeopleId: 0, maxStarshipsId: 0 } });
         },
       }),
     );
@@ -36,8 +36,8 @@ export class BattleEngineService {
         console.log(mode);
 
         return mode === GameMode.PEOPLE
-          ? this.getPeopleContenders$(metadata.totalPeopleCount)
-          : this.getStarshipContenders$(metadata.totalStarshipsCount);
+          ? this.getPeopleContenders$(metadata.maxPeopleId)
+          : this.getStarshipContenders$(metadata.maxStarshipsId);
       }),
     );
   }

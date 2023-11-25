@@ -10,8 +10,8 @@ const DEFAULT_BATTLE_STATE_MODEL: BattleStateModel = {
     secondContenderWins: 0,
   },
   gameMetadata: {
-    totalPeopleCount: 0,
-    totalStarshipsCount: 0,
+    maxPeopleId: 0,
+    maxStarshipsId: 0,
   },
 };
 

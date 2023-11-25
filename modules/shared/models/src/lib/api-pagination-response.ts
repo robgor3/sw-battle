@@ -7,5 +7,5 @@ export interface ApiPaginationResponse {
   total_pages: number;
   previous: string;
   next: string;
-  results: ApiPaginationPayload;
+  results: ApiPaginationPayload[];
 }

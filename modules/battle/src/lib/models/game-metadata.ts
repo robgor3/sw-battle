@@ -1,4 +1,4 @@
 export interface GameMetadata {
-  totalPeopleCount: number;
-  totalStarshipsCount: number;
+  maxPeopleId: number;
+  maxStarshipsId: number;
 }

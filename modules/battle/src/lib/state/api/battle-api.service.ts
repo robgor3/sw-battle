@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiPaginationResponse, ApiResponse } from '@sw-battle/shared/models';
-import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { ApiPaginationPayload, ApiPaginationResponse, ApiResponse } from '@sw-battle/shared/models';
+import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { GameMetadata } from '../../models/game-metadata';
 import { Person } from '../../models/person';
 import { PersonApi } from '../../models/person-api';
@@ -14,18 +14,13 @@ export class BattleApiService {
   constructor(private readonly http: HttpClient, private readonly battleAdapterService: BattleAdapterService) {}
 
   public getGameMetadata$(): Observable<GameMetadata> {
-    const peopleMetadata = this.http
-      .get<ApiPaginationResponse>('people')
-      .pipe(map((response: ApiPaginationResponse) => response.total_records));
-
-    const starshipsMetadata = this.http
-      .get<ApiPaginationResponse>('starships')
-      .pipe(map((response: ApiPaginationResponse) => response.total_records));
+    const peopleMetadata: Observable<number> = this.getHighestIdFromResource$('people');
+    const starshipsMetadata: Observable<number> = this.getHighestIdFromResource$('starships');
 
     return forkJoin([peopleMetadata, starshipsMetadata]).pipe(
-      map(([totalPeopleCount, totalStarshipsCount]: [number, number]) => ({
-        totalPeopleCount,
-        totalStarshipsCount,
+      map(([maxPeopleId, maxStarshipsId]: [number, number]) => ({
+        maxPeopleId,
+        maxStarshipsId,
       })),
     );
   }
@@ -41,6 +36,22 @@ export class BattleApiService {
     return this.http.get<ApiResponse<StarshipApi>>(`starships/${id}`).pipe(
       map((response: ApiResponse<StarshipApi>) => this.battleAdapterService.adaptStarship(response)),
       catchError(() => of(null)),
+    );
+  }
+
+  private getHighestIdFromResource$(resourceUrl: string): Observable<number> {
+    return this.http.get<ApiPaginationResponse>(resourceUrl).pipe(
+      switchMap((response: ApiPaginationResponse) => {
+        const totalRecordsCount: number = response.total_records;
+
+        return this.http.get<ApiPaginationResponse>(`${resourceUrl}?page=1&limit=${totalRecordsCount}`).pipe(
+          map((response: ApiPaginationResponse) => {
+            const lastRecord: ApiPaginationPayload = response.results[totalRecordsCount - 1];
+
+            return +lastRecord.uid;
+          }),
+        );
+      }),
     );
   }
 }
