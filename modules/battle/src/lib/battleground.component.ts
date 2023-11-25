@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective } from '@sw-battle/ui';
+import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective, SelectComponent } from '@sw-battle/ui';
 import { Observable } from 'rxjs';
 import { BattleService } from './battle.service';
 import { Contender } from './models/contender';
@@ -11,7 +11,14 @@ import { BattleApiService } from './state/api/battle-api.service';
 import { BattleState } from './state/battle.state';
 
 @Component({
-  imports: [CommonModule, PlayerComponent, ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective],
+  imports: [
+    CommonModule,
+    PlayerComponent,
+    ButtonComponent,
+    ButtonPrimaryDirective,
+    ButtonWarnDirective,
+    SelectComponent,
+  ],
   providers: [BattleService, BattleState, BattleApiService, BattleAdapterService],
   standalone: true,
   selector: 'sw-battle-battleground',
@@ -26,6 +33,10 @@ export class BattlegroundComponent {
 
   constructor(private readonly battleService: BattleService) {
     this.battleService.init();
+  }
+
+  public setGameMode(mode: GameMode): void {
+    this.battleService.setGameMode(mode);
   }
 
   public onFightButtonClick(): void {

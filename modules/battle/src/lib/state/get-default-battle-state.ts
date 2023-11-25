@@ -2,7 +2,7 @@ import { BattleStateModel } from '../models/battle-state-model';
 import { GameMode } from '../models/game-mode';
 
 const DEFAULT_BATTLE_STATE_MODEL: BattleStateModel = {
-  gameMode: GameMode.STANDARD,
+  gameMode: GameMode.PEOPLE,
   firstContender: null,
   secondContender: null,
   result: {

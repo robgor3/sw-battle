@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, map, Observable, take, tap } from 'rxjs';
 import { BattleStateModel } from '../models/battle-state-model';
+import { GameMode } from '../models/game-mode';
 import { BattleApiService, GameMetadata } from './api/battle-api.service';
 import { getDefaultBattleState } from './get-default-battle-state';
 
@@ -19,6 +20,10 @@ export class BattleState {
         }),
       )
       .subscribe();
+  }
+
+  public setGameMode(gameMode: GameMode): void {
+    this.patchState({ gameMode });
   }
 
   public getGameMetadata(): void {
