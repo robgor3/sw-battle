@@ -16,6 +16,15 @@ export class BattleService {
   public readonly secondContender$: Observable<Contender> = this.store.select(
     ({ secondContender }: BattleStateModel) => secondContender,
   );
+  public readonly firstContenderWinsCount$: Observable<number> = this.store.select(
+    ({ firstContenderWinsCount }: BattleStateModel) => firstContenderWinsCount,
+  );
+  public readonly secondContenderWinsCount$: Observable<number> = this.store.select(
+    ({ secondContenderWinsCount }: BattleStateModel) => secondContenderWinsCount,
+  );
+  public readonly winnerId$: Observable<number | null> = this.store.select(
+    ({ currentWinnerId }: BattleStateModel) => currentWinnerId,
+  );
   public readonly gameMode$: Observable<GameMode> = this.store.select(({ gameMode }: BattleStateModel) => gameMode);
   public readonly gameMetadata$: Observable<GameMetadata> = this.store.select(
     ({ gameMetadata }: BattleStateModel) => gameMetadata,

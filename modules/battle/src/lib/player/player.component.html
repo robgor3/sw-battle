@@ -1,16 +1,20 @@
 <div class="player">
-  <mat-card class="player__card">
+  <mat-card [class.player-card--winner]="!!winnerId && player?.id === winnerId" class="player-card">
     <mat-card-header>
       <mat-card-title-group>
-        <mat-card-title>{{ 'contender name' }}</mat-card-title>
-        <!--        <mat-card-subtitle>Subtitle</mat-card-subtitle>-->
+        <mat-card-title class="player-card__title">{{
+          player?.name ? player?.name : 'Start fight to see contender'
+        }}</mat-card-title>
+        <mat-card-subtitle *ngIf="!!player" class="player-card__wins"
+          >Wins: <span class="player-card__wins--counter">{{ winsCount }}</span></mat-card-subtitle
+        >
       </mat-card-title-group>
     </mat-card-header>
 
-    <mat-card-content>content</mat-card-content>
+    <mat-card-content *ngIf="!!player" class="player-card__content">
+      {{ strength }}
+    </mat-card-content>
 
-    <mat-card-footer>footer</mat-card-footer>
-
-    <mat-card-actions>actions</mat-card-actions>
+    <mat-card-footer *ngIf="!!player" class="player-card__footer"> Based on {{ paramName }} value </mat-card-footer>
   </mat-card>
 </div>

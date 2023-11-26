@@ -14,7 +14,7 @@ export class BattleAdapterService {
 
     const personProps: PersonApi = response.result.properties;
 
-    return { id: +response.result.uid, name: personProps.name, mass: +personProps.mass };
+    return { id: +response.result.uid, name: personProps.name, mass: this.resolveBattleParam(personProps.mass) };
   }
 
   public adaptStarship(response: ApiResponse<StarshipApi>): Starship | null {
@@ -24,6 +24,12 @@ export class BattleAdapterService {
 
     const starshipProps: StarshipApi = response.result.properties;
 
-    return { id: +response.result.uid, name: starshipProps.name, crew: +starshipProps.crew };
+    return { id: +response.result.uid, name: starshipProps.name, crew: this.resolveBattleParam(starshipProps.crew) };
+  }
+
+  private resolveBattleParam(input: string): number {
+    const param: number = +input;
+
+    return isNaN(param) ? 0 : Math.floor(param);
   }
 }

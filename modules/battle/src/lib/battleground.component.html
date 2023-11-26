@@ -1,14 +1,23 @@
 <section class="battleground">
-  <div>some header or sth</div>
-
   <div class="game">
-    <div class="game__players">
-      <sw-battle-player [contender]="firstContender$ | async"></sw-battle-player>
-      <sw-battle-player [contender]="secondContender$ | async"></sw-battle-player>
+    <div class="game__settings">
+      <sw-battle-ui-select (selectionChange)="setGameMode($event)"></sw-battle-ui-select>
+    </div>
+
+    <div *swBattleLet="winnerId$ | async as winnerId" class="game__players">
+      <sw-battle-player
+        [contender]="firstContender$ | async"
+        [winsCount]="firstContenderWinsCount$ | async"
+        [winnerId]="winnerId"
+      ></sw-battle-player>
+      <sw-battle-player
+        [contender]="secondContender$ | async"
+        [winsCount]="secondContenderWinsCount$ | async"
+        [winnerId]="winnerId"
+      ></sw-battle-player>
     </div>
 
     <div class="game__actions">
-      <sw-battle-ui-select (selectionChange)="setGameMode($event)"></sw-battle-ui-select>
       <sw-battle-ui-button (click)="onResetButtonClick()" [text]="'Reset game'" swBattleWarnPrimary />
       <sw-battle-ui-button (click)="onFightButtonClick()" [text]="'Fight!'" swBattleButtonPrimary />
     </div>

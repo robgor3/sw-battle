@@ -1,7 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective, SelectComponent } from '@sw-battle/ui';
+import {
+  ButtonComponent,
+  ButtonPrimaryDirective,
+  ButtonWarnDirective,
+  LetDirective,
+  SelectComponent,
+} from '@sw-battle/ui';
 import { Observable, take } from 'rxjs';
 import { BattleService } from './battle.service';
 import { BattleEngineService } from './engine/battle-engine.service';
@@ -20,6 +26,7 @@ import { BattleStore } from './state/battle-store.service';
     ButtonPrimaryDirective,
     ButtonWarnDirective,
     SelectComponent,
+    LetDirective,
   ],
   providers: [BattleService, BattleStore, BattleApiService, BattleAdapterService, BattleEngineService],
   standalone: true,
@@ -31,6 +38,9 @@ import { BattleStore } from './state/battle-store.service';
 export class BattlegroundComponent implements OnInit {
   public readonly firstContender$: Observable<Contender> = this.battleService.firstContender$;
   public readonly secondContender$: Observable<Contender> = this.battleService.secondContender$;
+  public readonly firstContenderWinsCount$: Observable<number> = this.battleService.firstContenderWinsCount$;
+  public readonly secondContenderWinsCount$: Observable<number> = this.battleService.secondContenderWinsCount$;
+  public readonly winnerId$: Observable<number | null> = this.battleService.winnerId$;
   public readonly gameMode$: Observable<GameMode> = this.battleService.gameMode$;
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
