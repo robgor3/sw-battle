@@ -27,7 +27,7 @@ export class BattleService {
     return this.battleEngineService.getGameMetadata$();
   }
 
-  public fight(): Observable<GameResult> {
+  public fight$(): Observable<GameResult> {
     return this.battleEngineService.playGame$({ metadata$: this.gameMetadata$, mode$: this.gameMode$ }).pipe(
       tap((result: GameResult) => {
         this.store.setGameResult(result);

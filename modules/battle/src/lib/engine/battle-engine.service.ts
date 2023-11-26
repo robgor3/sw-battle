@@ -9,6 +9,9 @@ import { Person } from '../models/person';
 import { Starship } from '../models/starship';
 import { BattleApiService } from '../state/api/battle-api.service';
 import { BattleStore } from '../state/battle-store.service';
+import { getDefaultBattleState } from '../state/get-default-battle-state';
+
+type GetPlayerFn = (id: number) => Observable<Contender>;
 
 @Injectable()
 export class BattleEngineService {
@@ -21,7 +24,8 @@ export class BattleEngineService {
           this.store.patchState({ gameMetadata });
         },
         error: () => {
-          this.store.patchState({ gameMetadata: { maxPeopleId: 0, maxStarshipsId: 0 } });
+          const defaultMetadataValue: GameMetadata = getDefaultBattleState().gameMetadata;
+          this.store.patchState({ gameMetadata: { ...defaultMetadataValue } });
         },
       }),
     );
@@ -29,13 +33,11 @@ export class BattleEngineService {
 
   public playGame$({ metadata$, mode$ }: GameParams): Observable<GameResult> {
     return combineLatest([mode$, metadata$]).pipe(
-      switchMap(([mode, metadata]: [GameMode, GameMetadata]) => {
-        console.log(mode);
-
-        return mode === GameMode.PEOPLE
+      switchMap(([mode, metadata]: [GameMode, GameMetadata]) =>
+        mode === GameMode.PEOPLE
           ? this.getPeopleContenders$(metadata.maxPeopleId)
-          : this.getStarshipContenders$(metadata.maxStarshipsId);
-      }),
+          : this.getStarshipContenders$(metadata.maxStarshipsId),
+      ),
       map(([firstContender, secondContender]: [ExistingContender, ExistingContender]) => ({
         winnerId: this.chooseWinner(firstContender, secondContender),
         firstContender,
@@ -174,5 +176,9 @@ export class BattleEngineService {
     }
 
     throw new Error('Unknown contender type');
+  }
+
+  private getPlayerMethod(mode: GameMode): GetPlayerFn {
+    return mode === GameMode.PEOPLE ? this.apiService.getPerson$ : this.apiService.getStarship$;
   }
 }

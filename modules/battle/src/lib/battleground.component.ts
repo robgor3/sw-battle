@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective, SelectComponent } from '@sw-battle/ui';
-import { Observable, take, tap } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { BattleService } from './battle.service';
 import { BattleEngineService } from './engine/battle-engine.service';
 import { Contender } from './models/contender';
@@ -45,7 +45,7 @@ export class BattlegroundComponent implements OnInit {
   }
 
   public onFightButtonClick(): void {
-    this.battleService.fight().pipe(take(1)).subscribe();
+    this.battleService.fight$().pipe(take(1)).subscribe();
   }
 
   public onResetButtonClick(): void {

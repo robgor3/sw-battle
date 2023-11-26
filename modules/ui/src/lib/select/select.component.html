@@ -1,7 +1,8 @@
+<!--TODO make reusable-->
 <mat-form-field>
   <mat-label>Choose game mode</mat-label>
   <mat-select (selectionChange)="changeGameMode($event)">
-    <mat-option [value]="0">People</mat-option>
-    <mat-option [value]="1">Starships</mat-option>
+    <mat-option [value]="GameMode.PEOPLE">People</mat-option>
+    <mat-option [value]="GameMode.STARSHIPS">Starships</mat-option>
   </mat-select>
 </mat-form-field>

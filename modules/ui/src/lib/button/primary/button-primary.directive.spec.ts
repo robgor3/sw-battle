@@ -22,9 +22,7 @@ describe(ButtonPrimaryDirective, () => {
     await TestBed.configureTestingModule({
       imports: [TestComponent, ButtonComponent, ButtonPrimaryDirective],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
 
