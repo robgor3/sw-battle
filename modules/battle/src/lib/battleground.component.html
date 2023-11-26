@@ -5,6 +5,7 @@
         [formControl]="gameModeControl"
         [options]="gameModeOptions"
         [label]="'Choose game mode'"
+        data-testId="game-mode-select"
       ></sw-battle-ui-select>
     </div>
 
@@ -13,11 +14,13 @@
         [contender]="firstContender$ | async"
         [winsCount]="firstContenderWinsCount$ | async"
         [winnerId]="winnerId"
+        data-testId="player-1"
       ></sw-battle-player>
       <sw-battle-player
         [contender]="secondContender$ | async"
         [winsCount]="secondContenderWinsCount$ | async"
         [winnerId]="winnerId"
+        data-testId="player-2"
       ></sw-battle-player>
     </div>
 
@@ -29,6 +32,7 @@
           [fullWidth]="true"
           class="game-action-button"
           swBattleButtonPrimary
+          data-testId="fight-button"
         />
         <sw-battle-ui-button
           (click)="onResetButtonClick()"
@@ -36,6 +40,7 @@
           [fullWidth]="true"
           class="game-action-button"
           swBattleWarnPrimary
+          data-testId="reset-button"
         />
       </div>
     </div>

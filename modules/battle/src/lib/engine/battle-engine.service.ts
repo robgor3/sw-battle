@@ -111,15 +111,13 @@ export class BattleEngineService {
     const firstContenderId: number = this.getRandomContenderId(rangeLimit);
     const secondContenderId: number = this.getRandomContenderId(rangeLimit);
 
-    if (firstContenderId === secondContenderId) {
-      return this.getContendersIds(rangeLimit);
-    }
-
     return [firstContenderId, secondContenderId];
   }
 
   private getRandomContenderId(max: number): number {
-    return Math.floor(Math.random() * max);
+    const id: number = Math.random() * max;
+
+    return Math.floor(id);
   }
 
   private generateNewIdForDuplicate(opponentId: number, rangeLimit: number): number {
