@@ -5,13 +5,18 @@ import { GameMetadata } from '../models/game-metadata';
 import { GameMode } from '../models/game-mode';
 import { GameParams } from '../models/game-params';
 import { GameResult } from '../models/game-result';
+import { GetContenderFn } from '../models/get-contender-fn';
 import { Person } from '../models/person';
-import { Starship } from '../models/starship';
 import { BattleApiService } from '../state/api/battle-api.service';
 import { BattleStore } from '../state/battle-store.service';
 import { getDefaultBattleState } from '../state/get-default-battle-state';
 
-type GetPlayerFn = (id: number) => Observable<Contender>;
+type GetContenderParams = {
+  getContenderFn: GetContenderFn;
+  id: number;
+  opponentId: number;
+  rangeLimit: number;
+};
 
 @Injectable()
 export class BattleEngineService {
@@ -33,11 +38,12 @@ export class BattleEngineService {
 
   public playGame$({ metadata$, mode$ }: GameParams): Observable<GameResult> {
     return combineLatest([mode$, metadata$]).pipe(
-      switchMap(([mode, metadata]: [GameMode, GameMetadata]) =>
-        mode === GameMode.PEOPLE
-          ? this.getPeopleContenders$(metadata.maxPeopleId)
-          : this.getStarshipContenders$(metadata.maxStarshipsId),
-      ),
+      switchMap(([mode, metadata]: [GameMode, GameMetadata]) => {
+        const getContenderFn: GetContenderFn = this.resolveGetContenderFn(mode);
+        const rangeLimit: number = mode === GameMode.PEOPLE ? metadata.maxPeopleId : metadata.maxStarshipsId;
+
+        return this.getContenders$(getContenderFn, rangeLimit);
+      }),
       map(([firstContender, secondContender]: [ExistingContender, ExistingContender]) => ({
         winnerId: this.chooseWinner(firstContender, secondContender),
         firstContender,
@@ -46,27 +52,37 @@ export class BattleEngineService {
     );
   }
 
-  private getPeopleContenders$(rangeLimit: number): Observable<[ExistingContender, ExistingContender]> {
+  private getContenders$(
+    getContender: GetContenderFn,
+    rangeLimit: number,
+  ): Observable<[ExistingContender, ExistingContender]> {
     const [firstContenderId, secondContenderId]: [number, number] = this.getContendersIds(rangeLimit);
 
-    const firstContender$: Observable<Person> = this.getPersonContender$(
-      firstContenderId,
-      secondContenderId,
+    const firstContender$: Observable<Person> = this.getContender$({
+      getContenderFn: getContender,
+      id: firstContenderId,
+      opponentId: secondContenderId,
       rangeLimit,
-    ) as Observable<Person>;
+    }) as Observable<Person>;
 
-    const secondContender$: Observable<Person> = this.getPersonContender$(
-      secondContenderId,
-      firstContenderId,
+    const secondContender$: Observable<Person> = this.getContender$({
+      getContenderFn: getContender,
+      id: secondContenderId,
+      opponentId: firstContenderId,
       rangeLimit,
-    ) as Observable<Person>;
+    }) as Observable<Person>;
 
     return forkJoin([firstContender$, secondContender$]).pipe(
-      switchMap(([firstContender, secondContender]: [Person | null, Person | null]) => {
+      switchMap(([firstContender, secondContender]: [Contender, Contender]) => {
         if (firstContender?.name === secondContender?.name) {
-          return this.getPersonContender$(secondContenderId, firstContenderId, rangeLimit).pipe(
+          return this.getContender$({
+            getContenderFn: getContender,
+            id: secondContenderId,
+            opponentId: firstContenderId,
+            rangeLimit,
+          }).pipe(
             map(
-              (anotherContender: Person | null) =>
+              (anotherContender: Contender) =>
                 [firstContender, anotherContender] as [ExistingContender, ExistingContender],
             ),
           );
@@ -77,61 +93,16 @@ export class BattleEngineService {
     );
   }
 
-  private getStarshipContenders$(rangeLimit: number): Observable<[ExistingContender, ExistingContender]> {
-    const [firstContenderId, secondContenderId]: [number, number] = this.getContendersIds(rangeLimit);
-
-    const firstContender$: Observable<Starship> = this.getStarshipContender$(
-      firstContenderId,
-      secondContenderId,
-      rangeLimit,
-    ) as Observable<Starship>;
-
-    const secondContender$: Observable<Starship> = this.getStarshipContender$(
-      secondContenderId,
-      firstContenderId,
-      rangeLimit,
-    ) as Observable<Starship>;
-
-    return forkJoin([firstContender$, secondContender$]).pipe(
-      switchMap(([firstContender, secondContender]: [Starship | null, Starship | null]) => {
-        if (firstContender?.name === secondContender?.name) {
-          return this.getStarshipContender$(secondContenderId, firstContenderId, rangeLimit).pipe(
-            map(
-              (anotherContender: Starship | null) =>
-                [firstContender, anotherContender] as [ExistingContender, ExistingContender],
-            ),
-          );
-        }
-
-        return of([firstContender, secondContender] as [ExistingContender, ExistingContender]);
-      }),
-    );
-  }
-
-  private getPersonContender$(id: number, opponentId: number, rangeLimit: number): Observable<Person | null> {
-    return this.apiService.getPerson$(id).pipe(
-      switchMap((person: Person | null) => {
-        if (!!person) {
-          return of(person) as Observable<Person>;
+  private getContender$({ getContenderFn, id, opponentId, rangeLimit }: GetContenderParams): Observable<Contender> {
+    return getContenderFn(id).pipe(
+      switchMap((contender: Contender) => {
+        if (!!contender) {
+          return of(contender);
         }
 
         const newId: number = this.generateNewIdForDuplicate(opponentId, rangeLimit);
 
-        return this.getPersonContender$(newId, opponentId, rangeLimit);
-      }),
-    );
-  }
-
-  private getStarshipContender$(id: number, opponentId: number, rangeLimit: number): Observable<Starship | null> {
-    return this.apiService.getStarship$(id).pipe(
-      switchMap((starship: Starship | null) => {
-        if (!!starship) {
-          return of(starship) as Observable<Starship>;
-        }
-
-        const newId: number = this.generateNewIdForDuplicate(opponentId, rangeLimit);
-
-        return this.getStarshipContender$(newId, opponentId, rangeLimit);
+        return this.getContender$({ getContenderFn, id: newId, opponentId, rangeLimit });
       }),
     );
   }
@@ -178,7 +149,9 @@ export class BattleEngineService {
     throw new Error('Unknown contender type');
   }
 
-  private getPlayerMethod(mode: GameMode): GetPlayerFn {
-    return mode === GameMode.PEOPLE ? this.apiService.getPerson$ : this.apiService.getStarship$;
+  private resolveGetContenderFn(mode: GameMode): GetContenderFn {
+    return mode === GameMode.PEOPLE
+      ? this.apiService.getPerson$.bind(this.apiService)
+      : this.apiService.getStarship$.bind(this.apiService);
   }
 }
