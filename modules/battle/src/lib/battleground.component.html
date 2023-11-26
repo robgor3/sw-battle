@@ -1,7 +1,11 @@
 <section class="battleground">
-  <div class="game">
+  <div *ngIf="gameModeControl" class="game">
     <div class="game__settings">
-      <sw-battle-ui-select (selectionChange)="setGameMode($event)"></sw-battle-ui-select>
+      <sw-battle-ui-select
+        [formControl]="gameModeControl"
+        [options]="gameModeOptions"
+        [label]="'Choose game mode'"
+      ></sw-battle-ui-select>
     </div>
 
     <div *swBattleLet="winnerId$ | async as winnerId" class="game__players">

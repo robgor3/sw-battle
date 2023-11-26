@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GameMode } from '@sw-battle/battle';
 import { ButtonComponent, ButtonPrimaryDirective, ButtonWarnDirective, SelectComponent } from '@sw-battle/ui';
 import { MockComponents, MockDirectives } from 'ng-mocks';
 import { of } from 'rxjs';
@@ -52,15 +51,6 @@ describe(BattlegroundComponent, () => {
 
   it('should get game metadata on init', () => {
     expect(battleService.getGameMetadata$).toHaveBeenCalledTimes(1);
-  });
-
-  describe('#setGameMode', () => {
-    it('should set game mode', () => {
-      component.setGameMode(GameMode.PEOPLE);
-
-      expect(battleService.setGameMode).toHaveBeenCalledTimes(1);
-      expect(battleService.setGameMode).toHaveBeenCalledWith(GameMode.PEOPLE);
-    });
   });
 
   describe('#onFightButtonClick', () => {

@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { GameMode } from '@sw-battle/battle';
+import { MatSelectModule } from '@angular/material/select';
 import { MockModule } from 'ng-mocks';
 import { SelectComponent } from './select.component';
-import spyOn = jest.spyOn;
 
 describe(SelectComponent, () => {
   let fixture: ComponentFixture<SelectComponent<string>>;
@@ -23,17 +21,5 @@ describe(SelectComponent, () => {
 
   it('should be defined', () => {
     expect(component).toBeDefined();
-  });
-
-  describe('#changeGameMode', () => {
-    it('should emit change gane mode event', () => {
-      const selectedGameMode: GameMode = GameMode.STARSHIPS;
-
-      spyOn(component.selectionChange, 'emit');
-
-      component.changeGameMode({ source: {} as unknown as MatSelect, value: selectedGameMode });
-
-      expect(component.selectionChange.emit).toHaveBeenCalledWith(selectedGameMode);
-    });
   });
 });

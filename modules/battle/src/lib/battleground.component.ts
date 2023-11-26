@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   ButtonComponent,
   ButtonPrimaryDirective,
   ButtonWarnDirective,
   LetDirective,
   SelectComponent,
+  SelectOption,
 } from '@sw-battle/ui';
-import { Observable, take } from 'rxjs';
+import { Observable, take, tap } from 'rxjs';
 import { BattleService } from './battle.service';
 import { BattleEngineService } from './engine/battle-engine.service';
 import { Contender } from './models/contender';
@@ -27,6 +29,7 @@ import { BattleStore } from './state/battle-store.service';
     ButtonWarnDirective,
     SelectComponent,
     LetDirective,
+    ReactiveFormsModule,
   ],
   providers: [BattleService, BattleStore, BattleApiService, BattleAdapterService, BattleEngineService],
   standalone: true,
@@ -41,17 +44,25 @@ export class BattlegroundComponent implements OnInit {
   public readonly firstContenderWinsCount$: Observable<number> = this.battleService.firstContenderWinsCount$;
   public readonly secondContenderWinsCount$: Observable<number> = this.battleService.secondContenderWinsCount$;
   public readonly winnerId$: Observable<number | null> = this.battleService.winnerId$;
-  public readonly gameMode$: Observable<GameMode> = this.battleService.gameMode$;
+  public readonly gameModeOptions: SelectOption<GameMode>[] = this.battleService.gameModeOptions;
+  public readonly gameModeControl: FormControl<GameMode> = new FormControl<GameMode>(GameMode.PEOPLE, {
+    nonNullable: true,
+  });
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   constructor(private readonly battleService: BattleService) {}
 
   public ngOnInit(): void {
     this.battleService.getGameMetadata$().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-  }
 
-  public setGameMode(mode: GameMode): void {
-    this.battleService.setGameMode(mode);
+    this.gameModeControl.valueChanges
+      .pipe(
+        tap((mode: GameMode) => {
+          this.battleService.setGameMode(mode);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
   }
 
   public onFightButtonClick(): void {

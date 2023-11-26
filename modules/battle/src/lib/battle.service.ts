@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SelectOption } from '@sw-battle/ui';
 import { Observable, tap } from 'rxjs';
 import { BattleEngineService } from './engine/battle-engine.service';
 import { BattleStateModel } from './models/battle-state-model';
@@ -29,6 +30,7 @@ export class BattleService {
   public readonly gameMetadata$: Observable<GameMetadata> = this.store.select(
     ({ gameMetadata }: BattleStateModel) => gameMetadata,
   );
+  public readonly gameModeOptions: SelectOption<GameMode>[] = this.createGameModeSelectOptions();
 
   constructor(private readonly store: BattleStore, private readonly battleEngineService: BattleEngineService) {}
 
@@ -50,5 +52,28 @@ export class BattleService {
 
   public resetGame(): void {
     this.store.resetStateWithoutMetadata();
+  }
+
+  private createGameModeSelectOptions(): SelectOption<GameMode>[] {
+    const x: (SelectOption<GameMode> | null)[] = Object.entries(GameMode)
+      .map(([key, value]: [string, string | GameMode]) => {
+        if (typeof value === 'string') {
+          return null;
+        }
+
+        return {
+          value: value as GameMode,
+          label: this.formatGameModeLabel(key),
+        };
+      })
+      .filter(Boolean);
+
+    return x as SelectOption<GameMode>[];
+  }
+
+  private formatGameModeLabel(label: string): string {
+    const lowercaseLabel: string = label.toLowerCase();
+
+    return lowercaseLabel.charAt(0).toUpperCase() + lowercaseLabel.slice(1);
   }
 }

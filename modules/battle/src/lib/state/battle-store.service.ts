@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
 import { BattleStateModel } from '../models/battle-state-model';
 import { GameMetadata } from '../models/game-metadata';
 import { GameMode } from '../models/game-mode';
@@ -11,22 +11,6 @@ export class BattleStore {
   private readonly state$: BehaviorSubject<BattleStateModel> = new BehaviorSubject<BattleStateModel>(
     getDefaultBattleState(),
   );
-
-  constructor() {
-    // TODO dev only, remove
-    this.state$
-      .pipe(
-        tap((state: BattleStateModel) => {
-          console.log(state);
-          console.log({
-            firstContender: state.firstContenderWinsCount,
-            secondContender: state.secondContenderWinsCount,
-            currentWinnerId: state.currentWinnerId,
-          });
-        }),
-      )
-      .subscribe();
-  }
 
   public setGameMode(gameMode: GameMode): void {
     this.patchState({ gameMode });
@@ -43,8 +27,8 @@ export class BattleStore {
       firstContender,
       secondContender,
       currentWinnerId: winnerId,
-      firstContenderWinsCount: firstContenderWins,
-      secondContenderWinsCount: secondContenderWins,
+      firstContenderWinsCount: !!winnerId ? firstContenderWins : firstContenderWinsCount,
+      secondContenderWinsCount: !!winnerId ? secondContenderWins : secondContenderWinsCount,
     });
   }
 

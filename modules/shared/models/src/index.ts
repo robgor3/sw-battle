@@ -3,3 +3,4 @@ export { ApiPaginationResponse } from './lib/api-pagination-response';
 export { ApiPayload } from './lib/api-payload';
 export { ApiResponse } from './lib/api-response';
 export { ApiResponseStatus } from './lib/api-response-status';
+export { SetValueFn } from './lib/set-value-fn';

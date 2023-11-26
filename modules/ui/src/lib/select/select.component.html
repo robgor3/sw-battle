@@ -1,8 +1,6 @@
-<!--TODO make reusable-->
 <mat-form-field>
-  <mat-label>Choose game mode</mat-label>
-  <mat-select (selectionChange)="changeGameMode($event)">
-    <mat-option [value]="GameMode.PEOPLE">People</mat-option>
-    <mat-option [value]="GameMode.STARSHIPS">Starships</mat-option>
+  <mat-label *ngIf="label">{{ label }}</mat-label>
+  <mat-select [formControl]="selectControl">
+    <mat-option *ngFor="let option of options" [value]="option.value">{{ option.label }} </mat-option>
   </mat-select>
 </mat-form-field>

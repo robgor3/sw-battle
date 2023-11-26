@@ -132,26 +132,41 @@ export class BattleEngineService {
     return newId;
   }
 
-  private chooseWinner(firstContender: Contender, secondContender: Contender): number {
+  private chooseWinner(firstContender: Contender, secondContender: Contender): number | null {
     if (!firstContender || !secondContender) {
       throw new Error('Unknown error during contenders draw');
     }
 
-    if ('mass' in firstContender && 'mass' in secondContender) {
-      const winner: Contender = firstContender.mass > secondContender.mass ? firstContender : secondContender;
-      return winner.id;
-    }
-    if ('crew' in firstContender && 'crew' in secondContender) {
-      const winner: Contender = firstContender.crew > secondContender.crew ? firstContender : secondContender;
-      return winner.id;
+    const firstContenderStrength: number = this.getContenderStrength(firstContender);
+    const secondContenderStrength: number = this.getContenderStrength(secondContender);
+
+    if (firstContenderStrength === secondContenderStrength) {
+      return null;
     }
 
-    throw new Error('Unknown contender type');
+    const winner: Contender = firstContenderStrength > secondContenderStrength ? firstContender : secondContender;
+
+    return winner.id;
   }
 
   private resolveGetContenderFn(mode: GameMode): GetContenderFn {
     return mode === GameMode.PEOPLE
       ? this.apiService.getPerson$.bind(this.apiService)
       : this.apiService.getStarship$.bind(this.apiService);
+  }
+
+  private getContenderStrength(contender: Contender): number {
+    if (!contender) {
+      throw new Error('At this point contender should be known!');
+    }
+
+    if ('mass' in contender) {
+      return contender.mass;
+    }
+    if ('crew' in contender) {
+      return contender.crew;
+    }
+
+    throw new Error('Cannot assert the winner, unknown contender type!');
   }
 }
