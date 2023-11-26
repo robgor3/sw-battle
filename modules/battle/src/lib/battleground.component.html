@@ -18,8 +18,22 @@
     </div>
 
     <div class="game__actions">
-      <sw-battle-ui-button (click)="onResetButtonClick()" [text]="'Reset game'" swBattleWarnPrimary />
-      <sw-battle-ui-button (click)="onFightButtonClick()" [text]="'Fight!'" swBattleButtonPrimary />
+      <div class="game-action-buttons-container">
+        <sw-battle-ui-button
+          (click)="onFightButtonClick()"
+          [text]="'Fight!'"
+          [fullWidth]="true"
+          class="game-action-button"
+          swBattleButtonPrimary
+        />
+        <sw-battle-ui-button
+          (click)="onResetButtonClick()"
+          [text]="'Reset game'"
+          [fullWidth]="true"
+          class="game-action-button"
+          swBattleWarnPrimary
+        />
+      </div>
     </div>
   </div>
 </section>
