@@ -1,10 +1,11 @@
-<section class="battleground">
+<section *swBattleLet="isFightInProgress$ | async as isFightInProgress" class="battleground">
   <div *ngIf="gameModeControl" class="game">
     <div class="game__settings">
       <sw-battle-ui-select
         [formControl]="gameModeControl"
         [options]="gameModeOptions"
         [label]="'Choose game mode'"
+        [disabled]="isFightInProgress"
         data-testId="game-mode-select"
       ></sw-battle-ui-select>
     </div>
@@ -30,6 +31,7 @@
           (click)="onFightButtonClick()"
           [text]="'Fight!'"
           [fullWidth]="true"
+          [disabled]="isFightInProgress"
           class="game-action-button"
           swBattleButtonPrimary
           data-testId="fight-button"
@@ -38,6 +40,7 @@
           (click)="onResetButtonClick()"
           [text]="'Reset game'"
           [fullWidth]="true"
+          [disabled]="isFightInProgress"
           class="game-action-button"
           swBattleWarnPrimary
           data-testId="reset-button"

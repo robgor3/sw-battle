@@ -48,6 +48,7 @@ export class BattlegroundComponent implements OnInit {
   public readonly gameModeControl: FormControl<GameMode> = new FormControl<GameMode>(GameMode.PEOPLE, {
     nonNullable: true,
   });
+  public readonly isFightInProgress$: Observable<boolean> = this.battleService.isFightInProgress$;
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   constructor(private readonly battleService: BattleService) {}

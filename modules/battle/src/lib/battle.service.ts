@@ -31,6 +31,9 @@ export class BattleService {
     ({ gameMetadata }: BattleStateModel) => gameMetadata,
   );
   public readonly gameModeOptions: SelectOption<GameMode>[] = this.createGameModeSelectOptions();
+  public readonly isFightInProgress$: Observable<boolean> = this.store.select(
+    ({ isFightInProgress }: BattleStateModel) => isFightInProgress,
+  );
 
   constructor(private readonly store: BattleStore, private readonly battleEngineService: BattleEngineService) {}
 
@@ -39,6 +42,8 @@ export class BattleService {
   }
 
   public fight$(): Observable<GameResult> {
+    this.store.setFightInProgress(true);
+
     return this.battleEngineService.playGame$({ metadata$: this.gameMetadata$, mode$: this.gameMode$ }).pipe(
       tap((result: GameResult) => {
         this.store.setGameResult(result);

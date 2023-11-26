@@ -8,6 +8,7 @@ const DEFAULT_BATTLE_STATE_MODEL: BattleStateModel = {
   currentWinnerId: null,
   firstContenderWinsCount: 0,
   secondContenderWinsCount: 0,
+  isFightInProgress: false,
   gameMetadata: {
     maxPeopleId: 0,
     maxStarshipsId: 0,

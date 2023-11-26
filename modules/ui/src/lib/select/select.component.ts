@@ -30,6 +30,18 @@ import { SelectOption } from '../models/select-option';
 export class SelectComponent<T> implements OnInit, ControlValueAccessor {
   @Input() public options: SelectOption<T>[] = [];
   @Input() public label: string | null = null;
+  @Input() public set disabled(isDisabled: boolean) {
+    if (!this.selectControl) {
+      return;
+    }
+
+    if (isDisabled) {
+      this.selectControl.disable();
+    } else {
+      this.selectControl.enable();
+    }
+  }
+
   @Output() public selectionChange: EventEmitter<T> = new EventEmitter<T>();
   protected readonly selectControl: FormControl<T | null> = new FormControl<T | null>(null);
   private readonly destroyRef: DestroyRef = inject(DestroyRef);

@@ -10,4 +10,5 @@ export interface BattleStateModel {
   firstContenderWinsCount: number;
   secondContenderWinsCount: number;
   gameMetadata: GameMetadata;
+  isFightInProgress: boolean;
 }

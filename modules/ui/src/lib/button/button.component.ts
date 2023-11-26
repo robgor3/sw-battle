@@ -13,4 +13,5 @@ export class ButtonComponent {
   @Input({ required: true }) public text: string = '';
   @Input() public color: string = '';
   @Input() public fullWidth: boolean = false;
+  @Input() public disabled: boolean = false;
 }

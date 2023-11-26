@@ -19,7 +19,7 @@
         "assets": ["./src/favicon.ico", "./src/assets"],
         "styles": [
           "./src/styles/overrides.scss",
-          "@angular/material/prebuilt-themes/deeppurple-amber.css",
+          "@angular/material/prebuilt-themes/indigo-pink.css",
           "./src/styles.scss"
         ],
         "scripts": []

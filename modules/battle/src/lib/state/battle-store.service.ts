@@ -12,6 +12,10 @@ export class BattleStore {
     getDefaultBattleState(),
   );
 
+  public setFightInProgress(isFightInProgress: boolean): void {
+    this.patchState({ isFightInProgress });
+  }
+
   public setGameMode(gameMode: GameMode): void {
     this.patchState({ gameMode });
   }
@@ -29,6 +33,7 @@ export class BattleStore {
       currentWinnerId: winnerId,
       firstContenderWinsCount: !!winnerId ? firstContenderWins : firstContenderWinsCount,
       secondContenderWinsCount: !!winnerId ? secondContenderWins : secondContenderWinsCount,
+      isFightInProgress: false,
     });
   }
 
